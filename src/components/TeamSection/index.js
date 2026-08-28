@@ -19,8 +19,8 @@ const TEAM_MEMBERS = [
   {
     name: 'Wendy Fabiola Aj Piox',
     role: 'QA / 2490-21-20938',
-    // TODO: coloca el archivo wb.jpg dentro de static/img/ (no en build/) y descomenta:
-    // photo: '/img/wb.jpg',
+    photo: '/img/wd.jpg',
+  
   },
 ];
 
@@ -52,17 +52,7 @@ export default function TeamSection() {
   return (
     <section className={styles.teamSection}>
       <div className="container">
-        <div className={styles.courseCard}>
-          <span className={styles.sectionLabel}>Información del curso</span>
-          <div className={styles.courseGrid}>
-            {COURSE_INFO.map((item) => (
-              <div key={item.label} className={styles.courseItem}>
-                <span className={styles.courseItemLabel}>{item.label}</span>
-                <span className={styles.courseItemValue}>{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        
 
         <Heading as="h2" className={styles.teamTitle}>
           Equipo de trabajo
@@ -76,7 +66,20 @@ export default function TeamSection() {
                 <p className={styles.memberRole}>{member.role}</p>
               </div>
             </div>
-          ))}
+            
+          ))
+          }
+        </div>
+        <div className={styles.courseCard}>
+          <span className={styles.sectionLabel}>Información del curso</span>
+          <div className={styles.courseGrid}>
+            {COURSE_INFO.map((item) => (
+              <div key={item.label} className={styles.courseItem}>
+                <span className={styles.courseItemLabel}>{item.label}</span>
+                <span className={styles.courseItemValue}>{item.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
