@@ -1,3 +1,4 @@
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 
@@ -10,10 +11,17 @@ const COURSE_INFO = [
 ];
 
 const TEAM_MEMBERS = [
-  {name: 'Integrante 1', role: 'Rol / carnet'},
-  {name: 'Integrante 2', role: 'Rol / carnet'},
-  {name: 'Integrante 3', role: 'Rol / carnet'},
-  {name: 'Integrante 4', role: 'Rol / carnet'},
+  {
+    name: 'Hendrix Estanely González Mendoza',
+    role: 'Desarrollador / 2490-18-20938',
+    photo: '/img/noe.jpg',
+  },
+  {
+    name: 'Wendy Fabiola Aj Piox',
+    role: 'QA / 2490-21-20938',
+    // TODO: coloca el archivo wb.jpg dentro de static/img/ (no en build/) y descomenta:
+    // photo: '/img/wb.jpg',
+  },
 ];
 
 function initials(fullName) {
@@ -23,6 +31,21 @@ function initials(fullName) {
     .join('')
     .slice(0, 2)
     .toUpperCase();
+}
+
+function MemberAvatar({name, photo}) {
+  const resolvedPhoto = useBaseUrl(photo ?? '');
+  if (!photo) {
+    return <div className={styles.avatar}>{initials(name)}</div>;
+  }
+  return (
+    <img
+      className={styles.avatarPhoto}
+      src={resolvedPhoto}
+      alt={name}
+      loading="lazy"
+    />
+  );
 }
 
 export default function TeamSection() {
@@ -48,7 +71,7 @@ export default function TeamSection() {
           {TEAM_MEMBERS.map((member) => (
             <div key={member.name} className="col col--3">
               <div className={styles.memberCard}>
-                <div className={styles.avatar}>{initials(member.name)}</div>
+                <MemberAvatar name={member.name} photo={member.photo} />
                 <p className={styles.memberName}>{member.name}</p>
                 <p className={styles.memberRole}>{member.role}</p>
               </div>

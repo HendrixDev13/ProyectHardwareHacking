@@ -80,6 +80,16 @@
   font-size: 1rem;
 }
 
+.avatarPhoto {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--hh-border-strong);
+}
+
 .memberName {
   margin-bottom: 0.25rem;
   color: var(--hh-fg);
