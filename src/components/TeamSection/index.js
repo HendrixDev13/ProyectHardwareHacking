@@ -19,8 +19,7 @@ const TEAM_MEMBERS = [
   {
     name: 'Wendy Fabiola Aj Piox',
     role: 'QA / 2490-21-20938',
-    photo: '/img/wd.jpg',
-  
+    photo: '/img/wd.jpeg',
   },
 ];
 
