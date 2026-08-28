@@ -1,0 +1,50 @@
+---
+title: Introducción al Hardware Hacking y Enfoque QA
+sidebar_position: 1
+slug: introduccion
+---
+
+# Módulo 1 — Fundamentos de Hardware Hacking y Enfoque QA
+
+:::tip Integración Docusaurus / GitHub
+Esta documentación está optimizada para vivir como archivos `.mdx` dentro del repositorio de GitHub del equipo, permitiendo renderizado dinámico con pestañas (`<Tabs>`) y alertas de auditoría nativas de Docusaurus.
+:::
+
+## 1.1 Definición y alcance del Hardware Hacking
+
+El **Hardware Hacking** (o *Hacking de Capa Física*) es la disciplina de la ciberseguridad orientada a analizar, evaluar, auditar e intervenir los componentes físicos, arquitecturas de circuitos, microcontroladores y buses de comunicación interna/externa de un sistema embebido o dispositivo IoT.
+
+A diferencia del hacking de software tradicional, donde las fronteras están delimitadas por código y memoria virtual, el Hardware Hacking explora el comportamiento físico de las señales de voltaje, reloj, radiofrecuencia y almacenamiento persistente no volátil.
+
+:::danger Alcance y autorización (Scope)
+Todo el contenido de este curso se ejecuta exclusivamente sobre **hardware propio o de laboratorio autorizado por el docente**, dentro de un entorno aislado y con consentimiento explícito. Auditar dispositivos de terceros sin autorización constituye un delito. Cada guía práctica de este sitio exige documentar el alcance (dispositivos, MAC/IDs objetivo, ventana de tiempo) antes de ejecutar cualquier comando.
+:::
+
+## 1.2 La perspectiva de Aseguramiento de Calidad de Software (SQA)
+
+Tradicionalmente, el QA de software se limita a pruebas funcionales, unitarias, de integración e interfaz de usuario (UI). Sin embargo, en el desarrollo moderno de Internet de las Cosas (IoT), dispositivos médicos, automoción y sistemas embebidos, **la calidad de software es inseparable de la seguridad física**:
+
+- **Superficie de ataque ampliada:** un software con cifrado perfecto en nivel de aplicación es vulnerable si la clave criptográfica se almacena en texto plano dentro de una memoria Flash SPI física externa, o se transmite sin protección en un bus UART.
+- **Pruebas ciego vs. pruebas físicas (Hardware-in-the-Loop):** los equipos de QA deben integrar vectores de inyección de fallos (*Fault Injection*), glitches de voltaje y análisis de bus para validar la resiliencia del firmware ante condiciones físicas adversas.
+- **Ciclo de vida SecDevOps para hardware:** definir criterios de aceptación donde las interfaces de depuración (JTAG/SWD) deban quedar deshabilitadas permanentemente mediante *efuses* antes de la producción en masa.
+
+:::note Por qué le importa esto a QA
+Un caso de prueba de auditoría de hardware es, en esencia, un caso de prueba negativo: valida que el sistema **rechace o contenga** una condición anómala (bus expuesto, paquete malformado, emparejamiento sin autenticar) de la misma forma que un test unitario valida que una función rechace una entrada inválida.
+:::
+
+## 1.3 Matriz de protocolos de comunicación física (interfaces hardware)
+
+Desglose técnico de los principales protocolos de nivel de placa/hardware que todo auditor de QA debe reconocer:
+
+| Protocolo | Líneas de señal (pines) | Modo de operación | Vulnerabilidad / riesgo QA |
+|---|---|---|---|
+| **UART** (Universal Asynchronous Receiver-Transmitter) | TX, RX, GND | Asíncrono, punto a punto (full-duplex) | Acceso directo a consolas de comandos root (Linux Shell) sin autenticación en arranque. |
+| **SPI** (Serial Peripheral Interface) | MOSI, MISO, SCLK, CS/SS | Síncrono, maestro-esclavo (full-duplex) | Extracción no autorizada de binarios de firmware descargando datos de la memoria Flash SPI. |
+| **I2C** (Inter-Integrated Circuit) | SDA, SCL, GND | Síncrono, bus multi-maestro (half-duplex) | Intercepción de datos de sensores críticos, spoofing de periféricos y manipulación de EEPROMs. |
+| **JTAG / SWD** (Joint Test Action Group) | TDI, TDO, TCK, TMS, TRST (o SWDIO/SWCLK) | Síncrono, prueba e *inbound debugging* | Extracción total de RAM/Flash, modificación de registros de CPU en tiempo de ejecución y bypass de firmware. |
+
+En los siguientes módulos nos enfocaremos en el vector inalámbrico (Bluetooth/BLE) como caso práctico de clase, pero esta matriz aplica como referencia conceptual para cualquier auditoría de hardware.
+
+## Siguiente paso
+
+Continúa con el [Módulo 2 — Entorno y Herramientas](/docs/entorno-y-herramientas) para configurar el laboratorio en Kali Linux y Parrot OS.

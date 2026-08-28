@@ -1,0 +1,93 @@
+.teamSection {
+  background: var(--hh-bg);
+  padding: 2rem 0 5rem;
+  border-top: 1px solid var(--hh-border);
+}
+
+.sectionLabel {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hh-glitch-b);
+}
+
+.courseCard {
+  padding: 2rem;
+  margin-bottom: 3.5rem;
+  border: 1px solid var(--hh-border);
+  border-radius: 14px;
+  background: var(--hh-card-bg);
+}
+
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.courseItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.courseItemLabel {
+  font-size: 0.8rem;
+  color: var(--hh-muted-2);
+}
+
+.courseItemValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--hh-fg);
+}
+
+.teamTitle {
+  margin-bottom: 2rem;
+  color: var(--hh-fg);
+  text-align: center;
+}
+
+.memberCard {
+  height: 100%;
+  padding: 1.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--hh-border);
+  border-radius: 14px;
+  background: var(--hh-card-bg);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.memberCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--hh-glitch-b);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--hh-glitch-b), #a855f7);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.memberName {
+  margin-bottom: 0.25rem;
+  color: var(--hh-fg);
+  font-weight: 600;
+}
+
+.memberRole {
+  margin-bottom: 0;
+  color: var(--hh-muted-2);
+  font-size: 0.9rem;
+}

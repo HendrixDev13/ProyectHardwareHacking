@@ -1,0 +1,49 @@
+---
+title: Vectores de Ataque en Hardware y Radiofrecuencia
+sidebar_position: 3
+slug: vectores-de-ataque-hardware
+---
+
+# Módulo 3 — Vectores de Ataque y Modos de Explotación
+
+## 3.1 Clasificación de vectores de ataque
+
+En la auditoría de hardware se evalúan tres categorías principales de explotación según la interacción con el objetivo:
+
+### 1. Ataques en reposo (*At-Rest / Physical Memory Dumping*)
+
+Consiste en la extracción de datos almacenados en los componentes físicos cuando el equipo está apagado o desenergizado. El atacante conecta clips de prueba (SOIC-8 / WSON-8) directamente a los pines de las memorias Flash/EEPROM para leer su contenido binario mediante programadores hardware (ej. CH341A o Bus Pirate).
+
+**Impacto QA:** permite la ingeniería inversa del firmware y la búsqueda de credenciales embebidas — un hallazgo típico es "clave API o certificado privado en texto plano dentro del dump de Flash".
+
+### 2. Ataques en tránsito (*In-Transit / Wireless Interception*)
+
+Captura de tráfico de datos sobre canales de comunicación inalámbricos (Bluetooth, Wi-Fi, Zigbee, LoRa). Mediante la intercepción de paquetes se analizan vulnerabilidades como:
+
+- Falta de cifrado a nivel de enlace.
+- Patrones de emparejamiento débil (*Just Works*).
+- Ausencia de autenticación mutua.
+
+Este es el vector que se audita en profundidad en el [Módulo 4 (Laboratorio Bluetooth)](/docs/laboratorio-bluetooth).
+
+### 3. Ataques de canal lateral (*Side-Channel Attacks*)
+
+Técnicas avanzadas que analizan parámetros físicos de ejecución del chip, tales como el consumo de corriente (*Simple/Differential Power Analysis* — SPA/DPA) o emisión electromagnética (EMA), para reconstruir claves criptográficas secretas (AES/RSA) procesadas por el hardware.
+
+:::note Alcance de este curso
+Los ataques de canal lateral requieren instrumentación especializada (osciloscopios, sondas EM) fuera del alcance del laboratorio de clase. Se documentan aquí solo a nivel conceptual para que el equipo de QA reconozca la categoría al clasificar un hallazgo según su vector de explotación.
+:::
+
+## 3.2 Cómo clasificar un hallazgo por vector
+
+Al redactar un reporte (ver [Módulo 5](/docs/mitigaciones-y-reporte)), identifica primero a cuál de las tres categorías pertenece el hallazgo — esto determina qué evidencia es exigible:
+
+| Categoría | Evidencia mínima exigible |
+|---|---|
+| En reposo | Dump binario (hex/bin) + hash SHA-256 del archivo extraído |
+| En tránsito | Captura `.pcap`/`.pcapng` (Wireshark) del tráfico interceptado |
+| Canal lateral | Trazas de osciloscopio o dataset de consumo de corriente |
+
+## Siguiente paso
+
+Continúa con el [Módulo 4 — Laboratorio Práctico de Bluetooth](/docs/laboratorio-bluetooth) para aplicar el vector "en tránsito" sobre BR/EDR y BLE.

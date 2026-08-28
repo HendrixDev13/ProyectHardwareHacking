@@ -4,20 +4,277 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
-  text-align: center;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  padding: 7rem 0 5.5rem;
+  text-align: center;
+  background: var(--hh-bg);
+  color: var(--hh-fg);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
+/* Vercel-style animated aurora glow */
+.heroAurora {
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 18% 25%, color-mix(in srgb, var(--hh-glitch-b) 30%, transparent), transparent 42%),
+    radial-gradient(circle at 82% 20%, color-mix(in srgb, #a855f7 26%, transparent), transparent 45%),
+    radial-gradient(circle at 50% 85%, color-mix(in srgb, var(--hh-glitch-a) 18%, transparent), transparent 40%);
+  filter: blur(70px);
+  animation: auroraMove 14s ease-in-out infinite alternate;
+}
+
+@keyframes auroraMove {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
+  100% {
+    transform: translate3d(-4%, 4%, 0) scale(1.12);
+  }
+}
+
+/* Vercel-style faint grid, faded toward the edges */
+.heroGrid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--hh-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hh-grid-line) 1px, transparent 1px);
+  background-size: 42px 42px;
+  -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, black 35%, transparent 75%);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  margin-bottom: 1.75rem;
+  border: 1px solid var(--hh-border);
+  border-radius: 999px;
+  background: var(--hh-card-bg);
+  color: var(--hh-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---- Two-word title: "Hardware" static, "Hacking" glitched ---- */
+
+.title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.titleStatic {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  color: var(--hh-muted);
+  font-weight: 700;
+}
+
+.glitchWord {
+  position: relative;
+  display: inline-block;
+  margin-top: 0.1em;
+  font-size: clamp(3.6rem, 11vw, 8rem);
+  color: var(--hh-fg);
+  animation: hackFlicker 5s infinite steps(1, end);
+}
+
+.glitchWord::before,
+.glitchWord::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: var(--hh-bg);
+  pointer-events: none;
+}
+
+.glitchWord::before {
+  color: var(--hh-glitch-a);
+  animation: glitchSliceA 2.4s infinite;
+  animation-timing-function: steps(2, jump-none);
+}
+
+.glitchWord::after {
+  color: var(--hh-glitch-b);
+  animation: glitchSliceB 1.9s infinite;
+  animation-timing-function: steps(2, jump-none);
+}
+
+/* Connection-under-attack: mostly stable, short signal-loss bursts */
+@keyframes hackFlicker {
+  0%,
+  84%,
+  88%,
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+  85% {
+    opacity: 0.3;
+    filter: blur(1px);
+  }
+  86% {
+    opacity: 0.9;
+  }
+  87% {
+    opacity: 0.15;
+    filter: blur(2px);
+  }
+}
+
+/* Digital corruption slices — jump between clip states instead of morphing */
+@keyframes glitchSliceA {
+  0% {
+    clip-path: inset(4% 0 88% 0);
+    transform: translate(0, 0);
+  }
+  15% {
+    clip-path: inset(62% 0 8% 0);
+    transform: translate(-6px, 1px);
+  }
+  30% {
+    clip-path: inset(20% 0 55% 0);
+    transform: translate(5px, -1px);
+  }
+  45% {
+    clip-path: inset(78% 0 4% 0);
+    transform: translate(-4px, 0);
+  }
+  60% {
+    clip-path: inset(2% 0 92% 0);
+    transform: translate(6px, 1px);
+  }
+  75% {
+    clip-path: inset(45% 0 30% 0);
+    transform: translate(-5px, 0);
+  }
+  90% {
+    clip-path: inset(30% 0 60% 0);
+    transform: translate(3px, -1px);
+  }
+  100% {
+    clip-path: inset(4% 0 88% 0);
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes glitchSliceB {
+  0% {
+    clip-path: inset(70% 0 6% 0);
+    transform: translate(0, 0);
+  }
+  20% {
+    clip-path: inset(10% 0 68% 0);
+    transform: translate(5px, -1px);
+  }
+  40% {
+    clip-path: inset(50% 0 25% 0);
+    transform: translate(-5px, 1px);
+  }
+  60% {
+    clip-path: inset(6% 0 85% 0);
+    transform: translate(4px, 0);
+  }
+  80% {
+    clip-path: inset(35% 0 45% 0);
+    transform: translate(-6px, -1px);
+  }
+  100% {
+    clip-path: inset(70% 0 6% 0);
+    transform: translate(0, 0);
+  }
+}
+
+.heroSubtitle {
+  max-width: 640px;
+  margin: 1.75rem 0 2.25rem;
+  color: var(--hh-muted);
+  font-size: 1.15rem;
+  line-height: 1.6;
 }
 
 .buttons {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.ctaPrimary {
+  background: var(--hh-fg);
+  color: var(--hh-cta-fg);
+  border: 1px solid var(--hh-fg);
+}
+
+.ctaPrimary:hover {
+  transform: translateY(-2px);
+  background: var(--hh-glitch-b);
+  border-color: var(--hh-glitch-b);
+  color: var(--hh-cta-fg);
+  text-decoration: none;
+}
+
+.ctaSecondary {
+  background: transparent;
+  color: var(--hh-fg);
+  border: 1px solid var(--hh-border-strong);
+}
+
+.ctaSecondary:hover {
+  transform: translateY(-2px);
+  border-color: var(--hh-muted);
+  color: var(--hh-fg);
+  text-decoration: none;
+}
+
+/* Keeps the sections below the hero (features + team) on the same themed canvas */
+.darkMain {
+  background: var(--hh-bg);
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 4.5rem 1.5rem 3.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroAurora,
+  .glitchWord,
+  .glitchWord::before,
+  .glitchWord::after {
+    animation: none;
+  }
 }

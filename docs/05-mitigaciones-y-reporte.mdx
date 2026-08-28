@@ -1,0 +1,56 @@
+---
+title: Mitigación y Plantilla de Reporte QA
+sidebar_position: 5
+slug: mitigaciones-y-reporte
+---
+
+# Módulo 5 — Remediación y Plantilla QA
+
+## 5.1 Estrategias de mitigación y contramedidas de seguridad
+
+Para garantizar la calidad y resiliencia en dispositivos con interfaces físicas y Bluetooth, el equipo de desarrollo debe implementar:
+
+- **Cierre de consolas físicas:** desactivar la emisión de la consola shell en puertos UART en builds de producción de firmware.
+- **Deshabilitación de JTAG:** quemado de fusibles *efuse* en microcontroladores (ej. ESP32, STM32) para impedir la lectura física de memoria de código.
+- **Emparejamiento BLE seguro (LE Secure Connections):** reemplazar el método desfasado *Just Works* por el algoritmo ECDH (*Elliptic Curve Diffie-Hellman*), exigiendo confirmación numérico-visual (*Passkey Entry* / *Numeric Comparison*).
+- **Modo no descubrible:** configurar dispositivos para que entren en modo no visible inmediatamente después de finalizar la sesión de emparejamiento autorizada.
+
+:::tip Checklist de aceptación QA
+Antes de aprobar un dispositivo para producción, verifica que cada uno de los cuatro puntos anteriores tenga una prueba de aceptación asociada y documentada — un control sin caso de prueba no es un control verificado.
+:::
+
+## 5.2 Plantilla estandarizada de reporte de vulnerabilidades de QA
+
+Todo hallazgo reportado en la documentación de Docusaurus debe seguir este formato. Cópialo como base para cada nuevo hallazgo:
+
+```markdown
+| Campo de auditoría              | Detalle del hallazgo                                    |
+|----------------------------------|-----------------------------------------------------------|
+| ID del defecto                   | BUG-HW-BT-XXX                                             |
+| Título                           |                                                             |
+| Módulo afectado                  |                                                             |
+| Severidad (CVSS v3.1)            | (Score) - Vector: AV:_/AC:_/PR:_/UI:_/S:_/C:_/I:_/A:_      |
+| Descripción                      |                                                             |
+| Pasos para reproducir            | 1. ...<br/>2. ...<br/>3. ...                              |
+| Resultado esperado               |                                                             |
+| Resultado observado              |                                                             |
+| Recomendación de remediación     |                                                             |
+```
+
+### Ejemplo de clase resuelto
+
+| Campo de auditoría | Detalle del hallazgo (ejemplo de clase) |
+|---|---|
+| ID del defecto | `BUG-HW-BT-001` |
+| Título | Denegación de servicio y colapso de pila por inyección L2CAP |
+| Módulo afectado | `04-laboratorio-bluetooth` / Controlador Bluetooth HCI |
+| Severidad (CVSS v3.1) | **Alta (7.5)** — Vector: `AV:A/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` |
+| Descripción | El firmware del dispositivo objetivo colapsa y entra en ciclo de reinicio cuando recibe ráfagas de paquetes L2CAP *echo request* con payload superior a 500 bytes. |
+| Pasos para reproducir | 1. Ejecutar `sudo hciconfig hci0 up`<br/>2. Escanear MAC objetivo con `hcitool scan`<br/>3. Iniciar inundación con `sudo l2ping -i hci0 -s 600 -f <MAC_OBJETIVO>` |
+| Resultado esperado | El dispositivo debe descartar o limitar la tasa (*rate-limit*) de paquetes L2CAP malformados. |
+| Resultado observado | Reinicio espontáneo del dispositivo y desconexión total de la interfaz inalámbrica. |
+| Recomendación de remediación | Implementar filtrado de tamaño de paquete en la capa L2CAP del driver BlueZ / firmware embebido. |
+
+:::note Trazabilidad
+Vincula cada `ID del defecto` con la evidencia recolectada en el módulo correspondiente (capturas, `.pcap`, logs) y, si aplica, con el commit o Pull Request donde se implementó la remediación.
+:::

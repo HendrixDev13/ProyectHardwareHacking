@@ -1,11 +1,41 @@
 .features {
-  display: flex;
-  align-items: center;
-  padding: 2rem 0;
+  padding: 3rem 0 4rem;
   width: 100%;
+  background: var(--hh-bg);
 }
 
-.featureSvg {
-  height: 200px;
-  width: 200px;
+.card {
+  height: 100%;
+  padding: 2rem 1.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--hh-border);
+  border-radius: 14px;
+  background: var(--hh-card-bg);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--hh-glitch-b);
+  background: var(--hh-card-bg);
+}
+
+.cardNumber {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.9rem;
+  color: var(--hh-glitch-b);
+  letter-spacing: 0.05em;
+}
+
+.cardTitle {
+  color: var(--hh-fg);
+  margin-bottom: 0.75rem;
+}
+
+.cardDescription {
+  color: var(--hh-muted);
+  line-height: 1.6;
+  margin-bottom: 0;
 }

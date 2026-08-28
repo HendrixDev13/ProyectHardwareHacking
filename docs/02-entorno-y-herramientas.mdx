@@ -1,0 +1,84 @@
+---
+title: Entorno y Herramientas (Kali vs Parrot OS)
+sidebar_position: 2
+slug: entorno-y-herramientas
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Módulo 2 — Análisis de Entornos y Toolkit QA
+
+## 2.1 Comparativa técnica: Kali Linux vs. Parrot OS
+
+En la auditoría de seguridad y pruebas de penetración, la elección del sistema operativo influye en la eficiencia del laboratorio. Como parte de las tecnologías del curso, comparamos el estándar de la industria (**Kali Linux**) con la tecnología emergente integrada (**Parrot OS**):
+
+| Criterio de evaluación | Kali Linux (estándar de clase) | Parrot OS (tecnología nueva) |
+|---|---|---|
+| Base de distribución | Debian Testing (Rolling Release) | Debian Stable (Rolling Release) |
+| Consumo de recursos | Moderado a alto (~1.5 GB RAM mínimo) | Muy bajo / optimizado (~500 MB RAM mínimo) |
+| Entorno de escritorio | XFCE / GNOME / KDE | MATE (ligero y ágil) |
+| Enfoque de seguridad | Penetration Testing puro y Red Teaming | Auditoría, desarrollo SecDevOps, privacidad y forense |
+| Aislamiento (sandboxing) | Estándar | Perfiles de AppArmor estrictos y Firejail preconfigurados |
+| Ecosistema Bluetooth | BlueZ nativo, suite utilitaria precargada | BlueZ nativo con wrappers de desarrollo integrados |
+
+:::tip Implicación para QA
+El sandboxing estricto de Parrot OS (AppArmor/Firejail) puede **bloquear silenciosamente** el acceso a `hci0` o a sockets RFCOMM durante una prueba. Si un comando funciona en Kali pero falla sin error claro en Parrot, verifica primero el perfil de AppArmor antes de asumir que la herramienta está rota — esto es en sí mismo un hallazgo de QA a documentar (falso negativo por entorno).
+:::
+
+## 2.2 Software & hardware toolkit de auditoría
+
+Para llevar a cabo las pruebas de QA en laboratorio se requiere un conjunto especializado de utilidades tanto lógicas como físicas:
+
+- **`hcitool` / `bluetoothctl`:** herramientas oficiales de la pila BlueZ para configuración del adaptador local, escaneo de dispositivos y inspección HCI (*Host Controller Interface*).
+- **`gatttool` / `sdptool`:** inspección de servicios SDP (*Service Discovery Protocol*) en Bluetooth Classic y lectura/escritura de características en servicios GATT (*Generic Attribute Profile*) de BLE.
+- **Wireshark + Kismet:** captura y análisis profundo de paquetes de radiofrecuencia sobre interfaces virtuales de monitorización.
+- **Hardware de intercepción:** Bus Pirate V3/V4 (analizador de protocolos SPI/I2C/UART), Ubertooth One (sniffer físico de paquetes Bluetooth a 2.4 GHz) y adaptadores Bluetooth 4.0/5.0 USB con soporte para HCIDump.
+
+## 2.3 Verificación del entorno (prerrequisito de laboratorio)
+
+Antes de cualquier prueba, el equipo de QA debe verificar y **dejar evidencia** (captura de pantalla o log) de que el entorno cumple los prerrequisitos: adaptador reconocido, pila BlueZ activa y permisos de root disponibles.
+
+<Tabs groupId="distro">
+  <TabItem value="kali" label="Kali Linux">
+
+```bash
+# Actualizar repositorios e instalar la suite BlueZ (si no viene precargada)
+sudo apt update && sudo apt install -y bluez bluez-tools wireshark kismet
+
+# Confirmar que el servicio bluetooth está activo
+systemctl status bluetooth --no-pager
+
+# Listar adaptadores Bluetooth detectados
+hciconfig -a
+```
+
+  </TabItem>
+  <TabItem value="parrot" label="Parrot OS">
+
+```bash
+# Actualizar repositorios e instalar la suite BlueZ
+sudo apt update && sudo apt install -y bluez bluez-tools wireshark kismet
+
+# Parrot puede requerir desactivar temporalmente el perfil AppArmor
+# del binario para pruebas autorizadas de laboratorio
+sudo aa-status | grep -i bluet
+sudo aa-complain /usr/lib/bluetooth/bluetoothd
+
+# Confirmar que el servicio bluetooth está activo
+systemctl status bluetooth --no-pager
+
+# Listar adaptadores Bluetooth detectados
+hciconfig -a
+```
+
+  </TabItem>
+</Tabs>
+
+:::warning Evidencia mínima de setup
+Guarda la salida de `hciconfig -a` (o `bluetoothctl show`) de **ambos** entornos como evidencia de prerrequisitos cumplidos antes de iniciar el laboratorio del Módulo 4. Sin esta evidencia, un hallazgo posterior no es reproducible ante el equipo de QA.
+:::
+
+## Siguiente paso
+
+Con el entorno verificado, continúa con el [Módulo 3 — Vectores de Ataque](/docs/vectores-de-ataque-hardware).
